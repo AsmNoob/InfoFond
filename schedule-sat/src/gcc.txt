@@ -1,0 +1,10 @@
+In file included from /usr/include/minisat/core/Solver.h:28:0,
+                 from Main.cpp:2:
+Main.cpp: In function ‘int main(int, char**)’:
+Main.cpp:198:56: error: ‘lbool’ was not declared in this scope
+       if (solver.modelValue(possibilities[x][s][t]) == l_True) {
+                                                        ^
+Main.cpp:198:56: note: suggested alternative:
+/usr/include/minisat/core/SolverTypes.h:88:7: note:   ‘Minisat::lbool’
+ class lbool {
+       ^

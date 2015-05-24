@@ -1,0 +1,459 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage[a4paper]{geometry}
+\usepackage{amsmath,amsthm,amssymb,latexsym,amsfonts}
+\usepackage{hyperref}
+\geometry{hscale=0.75,vscale=0.75,centering}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\usepackage{tikz}
+
+\begin{document}
+
+  \lstset{language=C,
+  basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  commentstyle=\color{cyan},    % comment style
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{blue}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  %showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=5,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{red},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+} 
+
+\begin{titlepage}
+    \begin{center}
+
+	\begin{tikzpicture}[remember picture, overlay]
+	  \node [anchor=north east, inner sep=0pt]  at (current page.north east)
+	     {\includegraphics[height=3cm]{Banniere_ULB.png}};
+	\end{tikzpicture}
+	
+        {\Large \textbf{\textsc{Faculté des Sciences}}\\
+        \textbf{\textsc{Département d'Informatique}}}
+
+        \vfill{}\vfill{}
+
+        \begin{center}
+            \Huge{INFO-H-302}
+                \Huge{Projet: Logique propositionnelle et utilisation de l'outil MiniSAT}
+        \end{center}
+        \Huge{\par}
+        \begin{center}
+            \large{
+                \textsc{Bertha} David \\
+                \textsc{Tio Nogueras} Gérard \\
+            }
+        \end{center}
+        \Huge{\par}
+
+        \vfill{}\vfill{}
+        \large{\par}
+
+        \vfill{}\vfill{}\enlargethispage{3cm}
+
+        \begin{figure} [h!]
+             \centering
+	    \includegraphics[width=4cm]{Sigle_ULB.png}
+	\end{figure}
+
+        \textbf{Année académique 2014~-~2015}
+        
+    \end{center}
+\end{titlepage}
+\newpage
+\tableofcontents
+\pagebreak
+\section{Introduction}
+\section{Questions}
+\subsection{Définition des contraints de $\mu$}
+\begin{enumerate}
+\item
+Chaque examen a bien lieu 1 fois.
+\item
+Chaque examen a lieu une seule fois pour une seule salle et une seule période.
+\item
+Les examens ne peuvent pas se dérouler dans des pièces de capacité insuffisante.
+\item
+Les examens d'un même étudiant ne peuvent pas avoir lieu en même temps.
+\item
+Les examens d'un même professeur ne peuvent pas avoir lieu en même temps.
+\item
+Deux examens différents ne peuvent pas avoir lieur dans la même salle en même temps.
+\end{enumerate}
+\subsection{Ecriture des contraintes sous forme logique(langage mathématique)}
+\begin{enumerate}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+\begin{equation}
+\forall x \in X,  \exists s \in S,  \exists t \in \{1,..,T\} | \mu(x) = ( s, t ). \\
+\end{equation}
+\end{minipage}}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+\begin{equation}
+\forall x \in X,  \exists! s \in S,  \exists! t \in \{1,..,T\} | \mu(x) = ( s, t ). \\
+\end{equation}
+\end{minipage}}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+Création d'une fonction qui nous donne le nombre d'étudiants par examen.
+\begin{equation}
+l: X -> \mathbb{N} | l(x) = n \Leftrightarrow \lVert \{  e \in E | x \in a(e) \} \rVert  = n
+\end{equation}
+\begin{equation}
+\forall x \in X, \forall s \in S | e(x) > c(s), \forall t \in \{1,..,T\} |  \mu(x) \neq  (s,t). \\
+\end{equation}
+\end{minipage}}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+\begin{equation}
+\forall e \in E,\forall x1,x2 \in X | x1,x2 \in a(e), \forall t1,t2 \in \{1,..,T\}, \forall s1,s2 \in S 
+\end{equation}
+\begin{equation}
+ | \mu(x1) = (s1,t1) \land \mu(x2) = (s2,t2) \rightarrow  t1 \neq t2.  \\
+\end{equation}
+\end{minipage}}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+\begin{equation}
+\forall p \in P,\forall x1,x2 \in X | x1,x2 \in b(e), \forall t1,t2 \in \{1,..,T\}, \forall s1,s2 \in S, 
+\end{equation}
+\begin{equation}
+ | \mu(x1) = (s1,t1) \land \mu(x2) = (s2,t2) \rightarrow  t1 \neq t2.  \\
+\end{equation}
+\end{minipage}}
+\item
+\fbox{\begin{minipage}{1.0\textwidth}
+\begin{equation}
+\forall x1, x2 \in X, \forall s \in S, \forall t \in \{1,..,T\} | ( \mu(x1) = (s,t) \land \mu(x2) = (s,t) ) \rightarrow x1 = x2
+\end{equation}
+\end{minipage}}
+\end{enumerate}
+\subsection{Construction de la formule en FNC}
+Nous manipulerons des indices commençant à 0 et non à 1 comme dans l'input. Nous faisons la reconversion avant de sortir les résultats.
+
+Les différentes propositions sont:
+\begin{enumerate}
+\item
+Les examens: $x \in X$
+\item
+Les salles: $s \in S$
+\item
+Les périodes temporelles: $t \in \{0,...,T-1\}$
+\end{enumerate}
+
+La proposition qui les regroupe:
+\begin{equation}
+p = \{ p \underset{x,s,t}{} | x \in X, s \in S, t \in \{0,...,T-1\} \}
+\end{equation} 
+
+
+\subsubsection{Expression des différentes contraintes}
+Les différentes contraintes sont reprises ensemble avec la concaténation de FNC, ce qui donne bien une FNC.
+\begin{enumerate}
+\item
+Chaque examen a lieu une fois:
+\begin{equation}
+\bigwedge\limits_{x \in X}\ (\bigvee \limits_{s \in S}\ \bigvee \limits_{t \in \{0,...,T-1\} }\ ( p\underset{x,s,t}\ ))
+\end{equation}
+\item
+Chaque examen a lieu une seule fois pour une seule salle et une seule période.
+% Ici j'hésite à rajouter s1 \neq s2 et t1 \neq t2
+% On a transformé \neg( a AND b) => (neg a OR neg b)
+\begin{equation}
+\bigwedge\limits_{x \in X}\ \bigwedge\limits_{s1,s2 \in S}\ \bigwedge\limits_{t1,t2 \in \{0,...,T-1\}}\ ( \neg p\underset{x,s1,t1}\ \lor \neg p\underset{x,s2,t2}\ )
+\end{equation}
+\item
+Les examens ne peuvent pas se dérouler dans des pièces de capacité insuffisante.
+Nous utilisons la fonction définie plus haut.
+%Si on peut reprendre directement la fonction définit plus tôt:
+\begin{equation}
+\bigwedge\limits_{x \in X}\ \bigwedge\limits_{s \in S, l(x) > c(s)}\ \bigwedge\limits_{t \in \{0,...,T-1\}}\ ( \neg p\underset{x,s,t}\ )
+\end{equation}
+\item
+Les examens d'un même étudiant ne peuvent pas avoir lieu en même temps.
+% Je n'arrive pas à représenter que les exams sont du même étudiant
+% même idée 2)
+\begin{equation}
+\bigwedge\limits_{e \in E}
+\bigwedge\limits_{x1,x2 \in X, x1,x2 \in a(e), x1 \neq x2}\ \bigwedge\limits_{s1,s2 \in S}\ \bigwedge\limits_{t \in \{0,...,T-1\}}\ ( \neg p\underset{x1,s1,t}\ \lor \neg p\underset{x2,s2,t}\ )
+\end{equation}
+\item
+Les examens d'un même professeur ne peuvent pas avoir lieu en même temps.
+\begin{equation}
+\bigwedge\limits_{e \in P}
+\bigwedge\limits_{x1,x2 \in X, x1,x2 \in b(e), x1 \neq x2}\ \bigwedge\limits_{s1,s2 \in S}\ \bigwedge\limits_{t \in \{0,...,T-1\}}\ ( \neg p\underset{x1,s1,t}\ \lor \neg p\underset{x2,s2,t}\ )
+\end{equation}
+\item
+Deux examens différents ne peuvent pas avoir la même salle en même temps.
+\begin{equation}
+\bigwedge\limits_{x1,x2 \in X, x1 \neq x2}\ \bigwedge\limits_{s \in S}\ \bigwedge\limits_{t \in \{0,...,T-1\}}\ ( \neg p\underset{x1,s,t}\ \lor \neg p\underset{x2,s,t}\ )
+\end{equation}
+\end{enumerate}
+
+%chaque examen a lieu une fois :
+%Pour tout examen, clause :
+%[examen][0][0] V [examen][0][1] V ... V [examen][0][T] V [examen][1][0] V ... V [examen][1][T-1]
+% V ... V [examen][0][S-1][0] V ... V [examen][0][S-1][T-1]
+%Si on doit même éviter le "pour tout examen" :
+%[0][0][0] V [0][0][1] V ... V [0][0][T] V [0][1][0] V ... V [0][1][T-1]
+% V ... V [0][S-1][0] V ... V [0][S-1][T-1]
+% ^ 
+%[1][0][0] V [1][0][1] V ... V [1][0][T] V [1][1][0] V ... V [1][1][T-1]
+% V ... V [1][S-1][0] V ... V [1][S-1][T-1]
+% ^ ... ^
+%[X-1][0][0] V [X-1][0][1] V...V [X-1][0][S-1][T-1]
+
+%chaque examen a lieu une seule fois
+% (NOT [0][0][0] V NOT [0][0][1]) ^ (NOT [0][0][0] V NOT [0][0][2]) ^ ... ^ (NOT [0][0][0] V NOT [0][0][T-1])
+% ^ (NOT [0][0][0] V NOT [0][1][1]) ^ (NOT [0][0][0] V NOT [0][1][2]) ^ ... ^ (NOT [0][0][0] V NOT [0][1][T-1])
+% ^ ...
+% ^ (NOT [0][0][0] V NOT [0][S-1][1]) ^ (NOT [0][0][0] V NOT [0][S-1][2]) ^ ... ^ (NOT [0][0][0] V NOT [0][S-1][T-1])
+% ^ (NOT [0][0][1] V NOT [0][0][0]) ^ (NOT [0][0][1] V NOT [0][0][2]) ^ ... ^ (NOT [0][0][0] V NOT [0][1][T-1])
+% etc, trop marre, trop chaud si on n'utilise pas les "pour tout"
+\subsection{Implémentation du problème}
+Nous avons récupéré le code du parseur fournit, en ajoutant le parsing des intervalles interdits ainsi
+que de la valeur k. La classe SchedSpec a été reprise dans un fichier à part en lui ajoutant des méthodes
+pour ajouter les contraintes à un solveur et récupérer les solutions d'un solveur.
+\lstinputlisting{../src/SchedSpec.hpp}
+En fonction de la version de Bison utilisé, l'include de Parser.h dans Parser.l doit éventuellement être changé en Parser.hpp.
+Un Makefile est disponible pour compiler notre code.
+
+
+\subsubsection{Exemples}
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+\end{lstlisting}
+Nous donneras $1,4;1,3;1,2;1,1;$.
+\begin{lstlisting}[frame=single]
+2; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+\end{lstlisting}
+Nous donneras $0$.
+
+\subsection{Ajout d'une durée variable}
+Cette implémentation est optimisable car il y a beaucoup de répétitions de clauses, 
+mais nous laissons le solveur se charger des simplifications.
+%tentative de reproduire ton développement
+\begin{equation}
+\bigwedge\limits_{x \in X}\ \bigwedge\limits_{s \in S}\ \bigwedge\limits_{t \in \{0,T-1\}}\ ( \bigwedge\limits_{d \in \{0, d(x)-1\}}\ (\neg p\underset{x,s,t}{} \bigvee\limits_{k \in \{d, d+d(x)-1\}, t-(d(x)-1)+k < T}\  (p\underset{x,s,t-(d(x)-1)+k}{})))
+\end{equation}
+%[examen][salle][temps] ==> ([examen][salle][temps-(duree-1)] ^ [examen][salle][temps-(durée-1)+1] ^ ... ^ [examen][salle][temps]) V ([examen][salle][temps-(duree-1)+1] ^ ... ^ [examen][salle][temps+1]) V ... V ([examen][salle][temps] ^ ... ^ [examen][salle][temps+(duree-1)]
+%FNC : après distribution :
+% (NOT [examen][salle][temps] V [examen][salle][temps-(duree-1)] V ... V [examen][salle][temps]) 
+%soit pas examen a cette période là, soit aussi la première position de l'intervale de durée de l'examen
+% ^ (NOT [examen][salle][temps] V [examen][salle][temps-(durée-1)+1] V ... V [examen][salle][temps+1])
+%soit pas examen a cette période là, soit aussi un de ceux en deuxième position de l'intervale de durée de l'examen
+% ^ ...
+% ^ (NOT [examen][salle][temps] V [examen][salle][temps] V ... V [examen][salle][temps+(duree-1)])
+%soit pas examen, soit au moins un de ceux en dernière position dans l'intervale
+
+\subsubsection{Exemples}
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;1;2;1; //d
+\end{lstlisting}
+Nous donneras $2,6;1,4;1,2;1,1;$.
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;4;2;1; //d
+\end{lstlisting}
+Nous donneras $0$.
+
+
+\subsection{Ajout d'intervalles de temps non-disponibles}
+%Pour tout examen, pour toute salle, pour toute période appartenant à un intervalle interdit
+%phi = phi ^ NOT [examen][salle][periode] (concaténation avec les clauses précédentes, à faire partout ?)
+%pour moi il suffit de tout prendre mais indiquer dans {0,..,T-1} qu'on enlève {d^1\underset{i},d^2\underset{i}} (1 \le i \le n )
+\begin{equation}
+\bigwedge\limits_{x \in X}\ \bigwedge\limits_{s \in S}\ \bigwedge\limits_{t \in [d_i^1,d_i^2] (1 \le i \le n ) }\ (\neg p\underset{x,s,t}\ )
+\end{equation}
+
+\subsubsection{Exemples}
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;1;2;1; //d
+1,1; //i
+\end{lstlisting}
+Nous donneras $2,6;1,5;1,3;1,2;$.
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;4;2;1; //d
+1,3; //i
+\end{lstlisting}
+Nous donneras $0$.
+\subsection{Ajout d'un nombre maximum de changements de locaux (ces pauvres élèves)}
+
+Nous définissons tous les ensembles de k+2 variables.
+Nous posons 
+
+\begin{equation}
+V = \{((x_1,s_1,t_1), ..., (x_{k+2},s_{k+2},t_{k+2}))\ |\ \forall i \in \{1,k+2\} : t_{i+1} > t_i, s_{i+1} \neq s_i, \forall j \in \{1,k+2\}, i \neq j : x_i \neq x_j
+\end{equation}
+Il s'agit donc de l'ensemble des tuples représentant k+1 changements de salles.
+
+\begin{equation}
+\bigwedge\limits_{v \in V}\ (\bigvee\limits_{(x_i,s_i,t_i) \in v}\  \neg p\underset{x_i,s_i,t_i}{})
+\end{equation}
+%Pour tout ensemble de k+2 variables (x,s,t), avec ti+1 > ti, si+1 != si, xi != xj 
+%(on progresse dans le temps, sur toutes les salles différents de la précédentes, en ne prenant en compte que les examens non déjà pris)
+%phi = phi ^ ( NOT (x0,s0,t0) V NOT (x1,s1,t1) V ... V NOT (xk+1,sk+1,tk+1)
+
+\subsubsection{Exemples}
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;1;2;1; //d
+1,1; //i
+1; //k
+\end{lstlisting}
+Nous donneras $2,6;1,5;1,3;1,2;$.
+\begin{lstlisting}[frame=single]
+4; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;4;2;1; //d
+1,1; //i
+1; //k
+\end{lstlisting}
+Nous donneras $0$.
+\subsection{Utilisation du mode MAX-SAT}
+Le mode MAX-SAT permet de distinguer les clauses dites hard des clauses dites soft.
+Les clauses soft peuvent ne pas être satisfaites, mais le solveur cherchera tout de 
+même à en satisfaire un maximum.
+
+Nous n'avons pas pu maitriser les outils suffisament rapidement pour en montrer
+une implémentation. Toutefois, le concept guidant l'implémentation aurait été le suivant :
+toutes les clauses en dehors de la contrainte du nombre de changements de salle
+auraient été définies hard. Pour minimiser le nombre de changement de salle,
+il faut maximiser le nombre de transitions possibles sans changement de salle.
+Ainsi, nous pouvons générer tous les couples [(x1,s1,t1), (x2,s2,t2)] tels que 
+$x1 \neg x2$, $s1 \neg s2$, $t2 > t1$. En ajoutant, pour chacun de ces couples,
+une clause disjonctive reprenant la négation de chacun de ses litéraux et marquée comme soft,
+nous incitons le solveur à minimiser le nombre de changements de salle.
+
+\subsection{Unité de temps entre les examens d'un même étudiant dans une salle différente}
+Cette contrainte diffère peu de la contrainte sur la non-simultanéité des examens d'un même étudiant.
+Il suffit d'étendre cette non-simultanéité à une période de temps supplémentaire.
+
+\begin{equation}
+\bigwedge\limits_{e \in E}
+\bigwedge\limits_{x1,x2 \in X, x1,x2 \in a(e), x1 \neq x2}\ \bigwedge\limits_{s1,s2 \in S, s1 \neq s2}\ \bigwedge\limits_{t \in \{0,...,T-2\}} ( 
+(\neg p\underset{x1,s1,t}\ \lor \neg p\underset{x2,s2,t}) \wedge 
+(\neg p\underset{x1,s1,t}\ \lor \neg p\underset{x2,s2,t+1} ) )
+\end{equation}
+
+\subsubsection{Exemples}
+\begin{lstlisting}[frame=single]
+6; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;1;2;1; //d
+1,1; //i
+1; //k
+\end{lstlisting}
+Nous donneras $1,6;1,5;1,3;1,2;$.
+\begin{lstlisting}[frame=single]
+5; //T
+2; //S
+30;2; //c
+2; //E
+4; //P
+4; //X
+1,2,3; 2,3,4; //a
+1;2;3;4; //b
+1;4;2;1; //d
+1,1; //i
+1; //k
+\end{lstlisting}
+Nous donneras $0$.
+\subsection{Ajout d'une contrainte naturelle supplémentaire}
+Certains enseignants plus agés ou habitants plus loin ne souhaitent pas être
+présents sur le campus trop tôt ou trop tard.
+Pour chaque enseignant, nous avons une fonction $q$ qui donne un ensemble de deux périodes pour lequel
+ils ne seront pas présents. 
+%modelisation logique : pour tout enseignant, pour tout examen de cet enseignant, pour toute salle, pour toute période dans l'ensemble, NOT mu(examen) = (salle, période)
+Pour la modélisation logique:
+\begin{equation}
+\forall e \in P, \forall x \in X,  \forall s \in S,  \forall t \in \{q1,q2 \in q(e)\} | \neg ( \mu(x) = ( s, t )) \\
+\end{equation}
+Maintenant la formule sous forme FNC:
+\begin{equation}
+\bigwedge\limits_{e \in P}\ \bigwedge\limits_{x \in X, x \in b(e)}\ \bigwedge\limits_{s \in S}\ \bigwedge\limits_{t \in \{q1,q2 \in q(e)\}} ( \neg p\underset{x,s,t}{} )
+\end{equation}
+\subsection{Le problème est NP-dur}
+%NP-dur : un NP-complet peut être traduit en ce pb
+Le problème SAT général est un problème NP-complet d'après le théorème de Cook. Or, nous venons de prouver
+que le problème d'emploi du temps peut se réduire à un problème SAT en un temps polynomial. Dans l'autre sens, tout problème SAT peut être traduit en problème
+d'emploi du temps en utilisant autant de cases temporelles qu'il y a de variables booléennes. Toutes les contraintes SAT peuvent être traduites en contraintes sur
+des périodes de temps.
+Par conséquent, le problème d'emploi du temps est NP-dur.
+\end{document}

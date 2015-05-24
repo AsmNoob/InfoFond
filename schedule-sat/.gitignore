@@ -1,0 +1,10 @@
+build/ 
+.settings/ 
+.cproject 
+.project 
+Rapport.aux 
+Rapport.log 
+Rapport.out 
+Rapport.synctex.gz 
+Rapport.toc 
+Rapport.pdf
